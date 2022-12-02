@@ -1,0 +1,39 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> Batlle </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Tab 2</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div *ngIf="activeEnemy.dead.value === false">
+    <p>
+      {{activeEnemy.name}}:
+      {{activeEnemy.maxHealth}}/{{activeEnemy.currentHealth.value}}
+    </p>
+    <ion-progress-bar
+      [value]="activeEnemy.getEnemyHealthPercentage()"
+      color="danger"
+    ></ion-progress-bar>
+  </div>
+
+  <div>
+    <p>
+      {{playerService.getPlayerName()}}:
+      {{playerService.getPlayerMaxHealth()}}/{{playerService.getPlayerCurrentHealth()}}
+    </p>
+    <ion-progress-bar
+      [value]="playerService.getPlayerHealthPercentage()"
+      color="success"
+    ></ion-progress-bar>
+    <ion-button *ngIf="activeEnemy.dead.value === false" (click)="attack()">damage</ion-button>
+  </div>
+
+  <p *ngIf="activeEnemy.dead.value"> you won</p>
+  <ion-button *ngIf="activeEnemy.dead.value" (click)="newBattle()">New Battle</ion-button>
+</ion-content>
