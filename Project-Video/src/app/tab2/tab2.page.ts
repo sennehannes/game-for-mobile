@@ -4,6 +4,7 @@ import { EnemyService } from '../services/enemy/enemy.service';
 import { PlayerService } from '../services/player/player.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { ItemService } from '../services/items/item.service';
+import { Network } from '@capacitor/network';
 
 @Component({
   selector: 'app-tab2',
@@ -18,6 +19,7 @@ export class Tab2Page {
   }
 
   setEnemyListeners(){
+    console.log(this.activeEnemy);
     this.subscrition =  this.activeEnemy.dead.subscribe((value) => {
       if(value === true){
         this.playerService.givePlayerBattleExperience(this.activeEnemy.exsperienceGain);
@@ -31,15 +33,19 @@ export class Tab2Page {
     this.playerService.playerDamage(this.activeEnemy.attack);
   }
 
-  newBattle(){
-    if(this.activeEnemy !== undefined){
-      this.subscrition.unsubscribe();
-      this.enemyService.resetEnemy(this.activeEnemy);
+  async newBattle(){
+    try{
+      console.log(this.activeEnemy);
+      if(this.activeEnemy !== undefined){
+        this.subscrition.unsubscribe();
+      }
+      const enemyList: Enemy[] = await this.enemyService.findEnemyByTreadLevel(this.playerService.getPlayerLevel());
+      const amountOfEnemys: number = enemyList.length;
+      this.activeEnemy = new Enemy(enemyList[Math.floor(Math.random() * amountOfEnemys)]);
+      this.setEnemyListeners();
+      this.playerService.healPlayer(this.playerService.getPlayerMaxHealth() - this.playerService.getPlayerCurrentHealth());
+    }catch{
+    console.log('error in new battle');
     }
-    const enemyList: Enemy[] = this.enemyService.findEnemyByTreadLevel(this.playerService.getPlayerLevel());
-    const amountOfEnemys: number = enemyList.length;
-    this.activeEnemy = enemyList[Math.floor(Math.random() * amountOfEnemys)];
-    this.setEnemyListeners();
-    this.playerService.healPlayer(this.playerService.getPlayerMaxHealth() - this.playerService.getPlayerCurrentHealth());
   }
 }

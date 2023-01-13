@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "365829673835",
+    "project_id": "project-mmo-2",
+    "storage_bucket": "project-mmo-2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365829673835:android:42247c11e0d59e74ff722e",
+        "android_client_info": {
+          "package_name": "com.senne.hannes.RPGgame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365829673835-lufbgkepmissae5mjmho595gejt1d2n0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.senne.hannes.RPGgame",
+            "certificate_hash": "8dd455a7536ffd48a9e3df5d898a4e96620d5009"
+          }
+        },
+        {
+          "client_id": "365829673835-56fo6tjc7rpm7ac676dqafk7icavfcn1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrAIzA69kGcCDg-r2molL_lVqdzNNFxig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "365829673835-56fo6tjc7rpm7ac676dqafk7icavfcn1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -14,7 +14,7 @@
   <div *ngIf="activeEnemy.dead.value === false">
     <p>
       {{activeEnemy.name}}:
-      {{activeEnemy.maxHealth}}/{{activeEnemy.currentHealth.value}}
+      {{activeEnemy.maxHealth}}/{{activeEnemy.currentHealth}}
     </p>
     <ion-progress-bar
       [value]="activeEnemy.getEnemyHealthPercentage()"

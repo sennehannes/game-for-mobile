@@ -4,6 +4,10 @@ import { Item } from 'src/DataTypes/itemdatatypes/item';
 import { rarity } from 'src/DataTypes/itemdatatypes/rarity';
 import { slots } from 'src/DataTypes/itemdatatypes/slots';
 import { Player } from 'src/DataTypes/playerdatatypes/player';
+import {from, Observable, of, Subscription} from 'rxjs';
+import { DatabaseService } from '../database.service';
+import { cloneDeep } from 'lodash';
+import { NetwerkService } from '../netwerk.service';
 
 
 @Injectable({
@@ -11,54 +15,65 @@ import { Player } from 'src/DataTypes/playerdatatypes/player';
 })
 export class PlayerService {
   #loggedInplayer: Player;
-  #playerList: Player[] = [];
+  #subscrition: Subscription;
   #selectedItem: Item;
   selectedAbility: Ability;
-  constructor() {
-    this.#playerList.push({
-      name: 'senne',
-      id: 1,
-      items:[],
-      maxHealth: 20,
-      currentHealth: 20,
-      defense: 0,
-      attack: 3,
-      speed: 0,
-      experience: 0,
-      level: 1,
-      equipedAbilitys: [],
-      usableAbilitys: [],
-    });
-    this.#playerList.push({
-      name: 'bram',
-      items: [],
-      id: 2,
-      maxHealth: 20,
-      currentHealth: 20,
-      defense:0,
-      attack:3,
-      speed: 0,
-      experience:0,
-      level: 1,
-      equipedAbilitys: [],
-      usableAbilitys: [],
+  constructor(private dbServic: DatabaseService,private netwerkService: NetwerkService ) {}
+
+  updateCurrentPlayer(){
+    const connection = this.netwerkService.isConnected();
+    connection.then((t) => {
+      if(t === true){
+        this.dbServic.updatePlayer('players',this.#loggedInplayer.documentid,this.#loggedInplayer);
+      }else
+      {
+        console.log('disconected');
+      }
     });
   }
-
   /**
    *login the given player.
    *
    * @param playerName
    * input string (playername).
    */
-  loginPlayer(playerName: string){
-    this.#loggedInplayer = this.#playerList.find((t) => t.name === playerName);
+  loginPlayer(playerName: string,playerWachtwoord: string){
+    this.dbServic.retrievePlayerByName('players', playerName).forEach(x => {
+      if (x.find((t) => t.name === playerName) !== undefined){
+        if(x.find((t) => t.name === playerName).wachtwoord === playerWachtwoord){
+          this.#loggedInplayer = x.find((t) => t.name === playerName);
+        }
+      }
+    });
+  }
+
+  registerPlayer(playerName: string,playerWachtwoord: string){
+    if(this.dbServic.retrievePlayerByName('players',playerName) === null){
+      const player = {
+        name: playerName,
+        id: 3,
+        wachtwoord: playerWachtwoord,
+        items: [],
+        maxHealth: 20,
+        currentHealth: 20,
+        defense: 0,
+        attack: 2,
+        experience: 0,
+        level: 1,
+        speed: 0,
+        equipedAbilitys: [],
+        usableAbilitys: []
+      };
+      this.dbServic.addToCollections<Player>('players',player);
+    }
   }
 
   /**
    * loggout the currently logged in player
    */
   loggoutPlayer(){
+    this.updateCurrentPlayer();
+    this.#subscrition.unsubscribe();
     this.#loggedInplayer = undefined;
   }
 
@@ -132,8 +147,14 @@ export class PlayerService {
     }
   }
 
-  givePlayerItem(newItem: Item) {
-    this.#loggedInplayer.items.push(newItem);
+  givePlayerItem(newItem: Promise<Item>) {
+    newItem
+      .then((result: Item) => {
+        this.#loggedInplayer.items.push(cloneDeep(result));
+        console.log(this.#loggedInplayer);
+        this.updateCurrentPlayer();
+      })
+      .catch((err: Error) => console.log('error in giving player a item'));
   }
 
   getPlayerLevel(): number {
@@ -150,6 +171,7 @@ export class PlayerService {
 
   givePlayerBattleExperience(experience: number){
     this.#loggedInplayer.experience += experience;
+    this.updateCurrentPlayer();
   }
   getAllEquipedItems(): Item[]{
     const equipedItems = this.#loggedInplayer.items.filter((t) => t.propertys.equipedSlot !== null);
@@ -158,7 +180,7 @@ export class PlayerService {
 
   removeItemFromBackpack(itemId: number){
     this.#loggedInplayer.items.splice(this.#loggedInplayer.items.indexOf(this.#loggedInplayer.items.find((t) => t.id === itemId)), 1);
-
+    this.updateCurrentPlayer();
   }
 
   itemHasAbilitys(item: Item): boolean{
@@ -231,6 +253,7 @@ export class PlayerService {
     );
     equipedItem.propertys.equipedSlot = null;
     this.#loggedInplayer.items.splice(equipedItemIndex, 1, equipedItem);
+    this.updateCurrentPlayer();
   }
 
   equipItem(slot: string) {
@@ -250,12 +273,14 @@ export class PlayerService {
         return t;
         });
         this.#selectedItem = undefined;
+        this.updateCurrentPlayer();
       }
     }
   }
 
   updateItems(playerItems: Item[]) {
     this.#loggedInplayer.items = playerItems;
+    this.updateCurrentPlayer();
   }
 
   showItemAbilitys(itemId) {
@@ -303,6 +328,7 @@ export class PlayerService {
 
   playerDamage(damage: number){
     this.#loggedInplayer.currentHealth -= damage;
+    this.updateCurrentPlayer();
   }
 
   getPlayerCurrentAttack() {
@@ -312,7 +338,7 @@ export class PlayerService {
   }
 
   getPlayerCurrentSpeed() {
-    let playerFullSpeed: number = this.getPlayerSpeed()
+    let playerFullSpeed: number = this.getPlayerSpeed();
     this.getAllEquipedItems().forEach((t) => playerFullSpeed += t.propertys.speedModifyer);
     return playerFullSpeed;
   }
@@ -330,5 +356,25 @@ export class PlayerService {
 
   healPlayer(healthpoints: number){
     this.#loggedInplayer.currentHealth += healthpoints;
+    this.updateCurrentPlayer();
+  }
+
+  exsperienceNeededToLevelup(): number{
+    const incrementationValue = 2;
+    const exsperienceNeeded = 150 * ((1 - Math.pow(incrementationValue,this.#loggedInplayer.level))/(1 - incrementationValue));
+    return exsperienceNeeded;
+  }
+
+  canLevelup(): boolean{
+    if(this.#loggedInplayer.experience > this.exsperienceNeededToLevelup()){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
+  levelUp(){
+    this.#loggedInplayer.level += 1;
+    this.updateCurrentPlayer();
   }
 }

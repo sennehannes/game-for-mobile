@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>tab4</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="playerService.playerLoggedIn() === false">
+    <ion-item>
+      <ion-item>
+        <ion-input placeholder="player name" type="text" class="ion-margin-top" [(ngModel)]='loginName'></ion-input>
+        <ion-input placeholder="player Wachtwoord" type="text" class="ion-margin-top" [(ngModel)]='loginWachtwoord'></ion-input>
+      </ion-item>
+    </ion-item>
+    <ion-item>
+      <ion-button (click)="playerService.loginPlayer(loginName,loginWachtwoord)">login</ion-button>
+      <ion-button (click)="playerService.registerPlayer(loginName,loginWachtwoord)">register</ion-button>
+    </ion-item>
+  </div>
+</ion-content>

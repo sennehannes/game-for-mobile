@@ -5,6 +5,7 @@ import { IonReorderGroup } from '@ionic/angular';
 import { ItemReorderEventDetail } from '@ionic/core';
 import { rarity } from 'src/DataTypes/itemdatatypes/rarity';
 import { ItemService } from '../services/items/item.service';
+import { Network } from '@capacitor/network';
 
 @Component({
   selector: 'app-tab1',
@@ -12,6 +13,9 @@ import { ItemService } from '../services/items/item.service';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page {
+  None: string;
+  Quality: string;
+  Slot: string;
   slots = slots.keys();
   raritys = rarity.keys();
   #filterType: string;

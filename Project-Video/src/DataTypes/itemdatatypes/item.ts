@@ -4,6 +4,7 @@ import { Propertys } from './property';
 export interface IItem {
   name: string;
   id: number;
+  documentid?: string;
   rarity: string;
   propertys: Propertys;
 }
@@ -11,6 +12,7 @@ export interface IItem {
 export class Item {
   name: string;
   id: number;
+  documentid?: string;
   rarity: string;
   propertys: Propertys;
 

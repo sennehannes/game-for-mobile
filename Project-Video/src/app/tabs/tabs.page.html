@@ -7,18 +7,25 @@
       <ion-label>Inventory</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="tab2" *ngIf="playerService.playerLoggedIn()">
+    <ion-tab-button *ngIf="playerService.playerLoggedIn() === true" tab="tab2">
       <span style="font-size: 2rem; color: Mediumslateblue">
         <i class="fa-solid fa-gamepad"></i>
       </span>
       <ion-label>Battle</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="tab3">
+    <ion-tab-button *ngIf="playerService.playerLoggedIn() === true" tab="tab3">
       <span style="font-size: 2rem; color: Mediumslateblue">
         <i class="fa-solid fa-person"></i>
       </span>
       <ion-label>Profile</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button *ngIf="playerService.playerLoggedIn() === false" tab="tab4">
+      <span style="font-size: 2rem; color: Mediumslateblue">
+        <i class="fa-solid fa-person"></i>
+      </span>
+      <ion-label>Login/Create</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

@@ -4,6 +4,8 @@ import { Ability } from './abilitys';
 export interface IPlayer {
     name: string;
     id: number;
+    wachtwoord: string;
+    documentid?: string;
     items?: Item[];
     maxHealth: number;
     currentHealth: number;
@@ -19,6 +21,8 @@ export interface IPlayer {
   export class Player {
     name: string;
     id: number;
+    wachtwoord: string;
+    documentid?: string;
     items?: Item[];
     maxHealth: number;
     currentHealth: number;

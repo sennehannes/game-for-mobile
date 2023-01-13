@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\Gebruiker\\Desktop\\school 2022-2023\\mobile-apps\\extra-oefening\\Project-Video\\apk.jks')
+            storePassword 'senne.h'
+            keyAlias 'Project-MMO'
+            keyPassword 'senne.h'
+        }
+    }
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.senne.hannes.RPGgame"
@@ -19,7 +27,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+          signingConfig signingConfigs.debug
         }
+      debug {
+        signingConfig signingConfigs.debug
+      }
     }
 }
 

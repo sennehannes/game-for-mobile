@@ -5,10 +5,11 @@ export interface IEnemy {
     name: string;
     id: number;
     maxHealth: number;
-    currentHealth: BehaviorSubject<number>;
+    currentHealth: number;
     defense: number;
     attack: number;
-    dead?: boolean;
+    dead?: BehaviorSubject<boolean>;
+    currentHealthBehavior?: BehaviorSubject<number>;
     treadLevel: number;
     exsperienceGain: number;
     lootTable: string;
@@ -19,18 +20,22 @@ export class Enemy {
     name: string;
     id: number;
     maxHealth: number;
-    currentHealth: BehaviorSubject<number>;
+    currentHealth: number;
     defense: number;
     attack: number;
     dead?: BehaviorSubject<boolean>;
+    currentHealthBehavior?: BehaviorSubject<number>;
     treadLevel: number;
     exsperienceGain: number;
     lootTable: string;
     speed: number;
     constructor(obj: IEnemy) {
+        this.currentHealthBehavior = new BehaviorSubject<number>(obj.currentHealth);
         this.dead = new BehaviorSubject<boolean>(false);
         Object.assign(this, obj);
-        this.currentHealth.subscribe((value) => {
+        this.currentHealth = this.currentHealthBehavior.value;
+        this.currentHealthBehavior.subscribe((value) => {
+            this.currentHealth = this.currentHealthBehavior.value;
             if(value <= 0){
                 if(this.dead.value !== true){
                     this.dead.next(true);
@@ -41,9 +46,9 @@ export class Enemy {
         });
     }
     damage?(damage: number){
-        this.currentHealth.next(this.currentHealth.value - damage);
+        this.currentHealthBehavior.next(this.currentHealthBehavior.value - damage);
     }
     getEnemyHealthPercentage?(): number{
-        return this.currentHealth.value/this.maxHealth;
+        return this.currentHealthBehavior.value/this.maxHealth;
     }
 }
